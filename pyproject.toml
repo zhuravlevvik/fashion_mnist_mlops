@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=70"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fashion-mnist-mlops"
+version = "0.1.0"
+description = "Reproducible LogRegression pipeline and API for Fashion-MNIST"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi==0.115.6",
+    "joblib==1.4.2",
+    "numpy==2.0.2",
+    "scikit-image==0.24.0",
+    "scikit-learn==1.5.2",
+    "uvicorn[standard]==0.34.0",
+]
+
+[project.scripts]
+fashion-data = "fashion_mnist_mlops.data:main"
+fashion-train = "fashion_mnist_mlops.train:main"
+fashion-evaluate = "fashion_mnist_mlops.evaluate:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-ra --strict-markers"
+testpaths = ["tests"]
+markers = [
+    "unit: isolated tests that do not require network or a trained production model",
+    "functional: tests that require a running API container",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["fashion_mnist_mlops"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+fail_under = 80
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
