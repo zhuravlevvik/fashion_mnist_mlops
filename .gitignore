@@ -45,6 +45,7 @@ htmlcov/
 .coverage
 .coverage.*
 .cache
+.cache/
 nosetests.xml
 coverage.xml
 *.cover
@@ -134,7 +135,6 @@ dmypy.json
 /data/raw/
 /data/processed/
 /models/
-/reports/
 /.dvc/cache/
 /.dvc/tmp/
 /.dvc-storage/

@@ -1,0 +1,109 @@
+schema: '2.0'
+stages:
+  download:
+    cmd: python -m fashion_mnist_mlops.data download
+    deps:
+    - path: config.ini
+      hash: md5
+      md5: 41235aa8658f883b3c556c6a44b7b882
+      size: 608
+    - path: src/fashion_mnist_mlops/config.py
+      hash: md5
+      md5: d85d1d260cd1a0360f96305f924cccf4
+      size: 1467
+    - path: src/fashion_mnist_mlops/data.py
+      hash: md5
+      md5: 2528d6fd88d2050f27d0e8514fa16a01
+      size: 5879
+    outs:
+    - path: data/raw
+      hash: md5
+      md5: 8a31b1338b609cf1133d1df639de606c.dir
+      size: 30878645
+      nfiles: 4
+  prepare:
+    cmd: python -m fashion_mnist_mlops.data prepare
+    deps:
+    - path: config.ini
+      hash: md5
+      md5: 41235aa8658f883b3c556c6a44b7b882
+      size: 608
+    - path: data/raw
+      hash: md5
+      md5: 8a31b1338b609cf1133d1df639de606c.dir
+      size: 30878645
+      nfiles: 4
+    - path: src/fashion_mnist_mlops/config.py
+      hash: md5
+      md5: d85d1d260cd1a0360f96305f924cccf4
+      size: 1467
+    - path: src/fashion_mnist_mlops/data.py
+      hash: md5
+      md5: 2528d6fd88d2050f27d0e8514fa16a01
+      size: 5879
+    outs:
+    - path: data/processed
+      hash: md5
+      md5: 172b17a74a544f1f7617f8a6b2153055.dir
+      size: 30869943
+      nfiles: 2
+  train:
+    cmd: python -m fashion_mnist_mlops.train
+    deps:
+    - path: config.ini
+      hash: md5
+      md5: 41235aa8658f883b3c556c6a44b7b882
+      size: 608
+    - path: data/processed/train.npz
+      hash: md5
+      md5: f86d53e32e0d811405feb919b3f8f644
+      size: 26444535
+    - path: src/fashion_mnist_mlops/config.py
+      hash: md5
+      md5: d85d1d260cd1a0360f96305f924cccf4
+      size: 1467
+    - path: src/fashion_mnist_mlops/model.py
+      hash: md5
+      md5: a531d8fc96a3ec3a8fd8d6f145f99459
+      size: 1657
+    - path: src/fashion_mnist_mlops/train.py
+      hash: md5
+      md5: 371c17d0e939fddbe0decf8580bf2e7d
+      size: 2405
+    outs:
+    - path: models/model.joblib
+      hash: md5
+      md5: 4a5ef28e43d807d980921aabb80397ba
+      size: 30785
+    - path: reports/train_summary.json
+      hash: md5
+      md5: e8c1bf768faaa65ab1f99d96ed385e93
+      size: 491
+  evaluate:
+    cmd: python -m fashion_mnist_mlops.evaluate
+    deps:
+    - path: config.ini
+      hash: md5
+      md5: 41235aa8658f883b3c556c6a44b7b882
+      size: 608
+    - path: data/processed/test.npz
+      hash: md5
+      md5: 54715450df9566c2a1728e6f3c8ea69c
+      size: 4425408
+    - path: models/model.joblib
+      hash: md5
+      md5: 4a5ef28e43d807d980921aabb80397ba
+      size: 30785
+    - path: src/fashion_mnist_mlops/evaluate.py
+      hash: md5
+      md5: 03f420eeb6b6f61fd4693eede8e04e3f
+      size: 3389
+    outs:
+    - path: reports/confusion_matrix.csv
+      hash: md5
+      md5: 07ebc8f75d370018e5a817e94a1aa1b8
+      size: 1900
+    - path: reports/metrics.json
+      hash: md5
+      md5: f8cdfd76c8bdc7241f614f9706cf155d
+      size: 1988

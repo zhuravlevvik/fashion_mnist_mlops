@@ -69,7 +69,7 @@ def build_parser() -> ArgumentParser:
 
 
 def main() -> None:
-    args = build_parser().parse_args().parse_args()
+    args = build_parser().parse_args()
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     train(args.config)
 

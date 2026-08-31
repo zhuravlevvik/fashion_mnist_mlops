@@ -1,0 +1,49 @@
+stages:
+  download:
+    cmd: python -m fashion_mnist_mlops.data download
+    deps:
+      - config.ini
+      - src/fashion_mnist_mlops/config.py
+      - src/fashion_mnist_mlops/data.py
+    outs:
+      - data/raw
+
+  prepare:
+    cmd: python -m fashion_mnist_mlops.data prepare
+    deps:
+      - config.ini
+      - data/raw
+      - src/fashion_mnist_mlops/config.py
+      - src/fashion_mnist_mlops/data.py
+    outs:
+      - data/processed
+    
+  train:
+    cmd: python -m fashion_mnist_mlops.train
+    deps:
+      - config.ini
+      - data/processed/train.npz
+      - src/fashion_mnist_mlops/config.py
+      - src/fashion_mnist_mlops/model.py
+      - src/fashion_mnist_mlops/train.py
+    outs:
+      - models/model.joblib
+      - reports/train_summary.json:
+          cache: false
+    
+  evaluate:
+    cmd: python -m fashion_mnist_mlops.evaluate
+    deps:
+      - config.ini
+      - data/processed/test.npz
+      - models/model.joblib
+      - src/fashion_mnist_mlops/evaluate.py
+    metrics:
+      - reports/metrics.json:
+          cache: false
+    plots:
+      - reports/confusion_matrix.csv:
+          cache: false
+          template: confusion
+          x: predicted
+          y: actual
