@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  IMAGE_NAME: fashion_mnist_mlops
+  IMAGE_NAME: ${{ vars.DOCKERHUB_IMAGE }}
 
 jobs:
   quality-train-build:
@@ -45,7 +45,7 @@ jobs:
       - name: Unit tests and coverage
         run: pytest -m unit --cov --cov-report=term-missing --cov-report=xml
 
-      - name: Perproduce ML pipeline
+      - name: Reproduce ML pipeline
         run: dvc repro
     
       - name: Build test container
@@ -55,4 +55,28 @@ jobs:
         run: docker run --rm "$IMAGE_NAME:test-${GITHUB_SHA}"
       
       - name: Build runtime container
-        run: docker build --target runtime -t "$IMAGE_NAME:${GITHUB_SHA}" .
+        run: |
+          docker build \
+            --target runtime \
+            -t "$IMAGE_NAME:${GITHUB_SHA}" \
+            -t "$IMAGE_NAME:latest" \
+            .
+
+      - name: Log in to Docker Hub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Push runtime and test images
+        if: github.event_name != 'pull_request'
+        run: |
+          docker tag \
+            "$IMAGE_NAME:test-${GITHUB_SHA}" \
+            "$IMAGE_NAME:test-latest"
+
+          docker push "$IMAGE_NAME:${GITHUB_SHA}"
+          docker push "$IMAGE_NAME:latest"
+          docker push "$IMAGE_NAME:test-${GITHUB_SHA}"
+          docker push "$IMAGE_NAME:test-latest"
