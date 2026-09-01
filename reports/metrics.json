@@ -1,0 +1,82 @@
+{
+  "accuracy": 0.8384,
+  "balanced_accuracy": 0.8384,
+  "macro_f1": 0.8354249617650045,
+  "minimum_required_accuracy": 0.8,
+  "test_samples": 10000,
+  "classification_report": {
+    "T-shirt/top": {
+      "precision": 0.7161500815660685,
+      "recall": 0.878,
+      "f1-score": 0.788858939802336,
+      "support": 1000.0
+    },
+    "Trouser": {
+      "precision": 0.9696048632218845,
+      "recall": 0.957,
+      "f1-score": 0.9632611977856065,
+      "support": 1000.0
+    },
+    "Pullover": {
+      "precision": 0.6950998185117967,
+      "recall": 0.766,
+      "f1-score": 0.7288296860133207,
+      "support": 1000.0
+    },
+    "Dress": {
+      "precision": 0.8597938144329897,
+      "recall": 0.834,
+      "f1-score": 0.8467005076142132,
+      "support": 1000.0
+    },
+    "Coat": {
+      "precision": 0.7328833172613307,
+      "recall": 0.76,
+      "f1-score": 0.7461953853706431,
+      "support": 1000.0
+    },
+    "Sandal": {
+      "precision": 0.9348268839103869,
+      "recall": 0.918,
+      "f1-score": 0.9263370332996973,
+      "support": 1000.0
+    },
+    "Shirt": {
+      "precision": 0.6614060258249641,
+      "recall": 0.461,
+      "f1-score": 0.5433117265763111,
+      "support": 1000.0
+    },
+    "Sneaker": {
+      "precision": 0.9094449853943525,
+      "recall": 0.934,
+      "f1-score": 0.9215589541193883,
+      "support": 1000.0
+    },
+    "Bag": {
+      "precision": 0.9548254620123203,
+      "recall": 0.93,
+      "f1-score": 0.9422492401215805,
+      "support": 1000.0
+    },
+    "Ankle boot": {
+      "precision": 0.9478957915831663,
+      "recall": 0.946,
+      "f1-score": 0.9469469469469469,
+      "support": 1000.0
+    },
+    "accuracy": 0.8384,
+    "macro avg": {
+      "precision": 0.8381931043719261,
+      "recall": 0.8384,
+      "f1-score": 0.8354249617650045,
+      "support": 10000.0
+    },
+    "weighted avg": {
+      "precision": 0.8381931043719262,
+      "recall": 0.8384,
+      "f1-score": 0.8354249617650045,
+      "support": 10000.0
+    }
+  }
+}
