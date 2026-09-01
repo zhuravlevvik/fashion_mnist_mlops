@@ -1,0 +1,15 @@
+.git
+.github
+.dvc/cache
+.dvc/tmp
+.dvc-storage
+.idea
+.pytest_cache
+.ruff_cache
+.uv_cache
+.venv
+data
+notebooks
+reports
+*.pyc
+__pycache__
