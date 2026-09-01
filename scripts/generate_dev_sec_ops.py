@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from argparse import ArgumentParser
 import subprocess
 import xml.etree.ElementTree as ET
+from argparse import ArgumentParser
 from pathlib import Path
 
 
