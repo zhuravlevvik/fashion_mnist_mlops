@@ -1,0 +1,14 @@
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+
+steps:
+  - uses: actions/checkout@v4
+  - run:  ruff check src tests scripts
+  - run:  pytest -m unit --cov --cov-report=term-missing --cov-report=xml
+  - run:  dvc repro
+  - run:  docker build --target test -t "$IMAGE_NAME:test-${GITHUB_SHA}" .
+  - run:  docker run --rm "$IMAGE_NAME:test-${GITHUB_SHA}"
