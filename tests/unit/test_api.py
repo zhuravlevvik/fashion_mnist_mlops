@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 
 from fashion_mnist_mlops.api import create_app, get_artifact
 from fashion_mnist_mlops.config import load_config
+from fashion_mnist_mlops.delivery import get_prediction_publisher
 from fashion_mnist_mlops.model import build_model
 from tests.unit.test_model import toy_dataset
 
@@ -24,7 +25,9 @@ def model_path(tmp_path: Path) -> Path:
 @pytest.mark.unit
 def test_health_and_prediction(model_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("MODEL_PATH", str(model_path))
+    monkeypatch.setenv("PREDICTION_DELIVERY", "disabled")
     get_artifact.cache_clear()
+    get_prediction_publisher.cache_clear()
     client = TestClient(create_app())
 
     assert client.get("/health").json() == {"status": "ok"}
@@ -36,13 +39,17 @@ def test_health_and_prediction(model_path: Path, monkeypatch: pytest.MonkeyPatch
 
     assert response.status_code == 200
     assert response.json()["label"] == "vertical"
+    assert response.json()["delivery"] == "disabled"
+    assert response.json()["prediction_id"]
     assert 0 <= response.json()["confidence"] <= 1
 
 
 @pytest.mark.unit
 def test_prediction_validation(model_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("MODEL_PATH", str(model_path))
+    monkeypatch.setenv("PREDICTION_DELIVERY", "disabled")
     get_artifact.cache_clear()
+    get_prediction_publisher.cache_clear()
     client = TestClient(create_app())
 
     assert client.post("/predict", json={"pixels": [0]}).status_code == 422
