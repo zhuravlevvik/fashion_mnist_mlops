@@ -65,7 +65,7 @@ def get_prediction_publisher() -> PredictionPublisher:
         return DisabledPublisher()
     if mode == "hbase":
         return HBaseGatewayPublisher(
-            base_url=os.environ("HBASE_GATEWAY_URL"),
+            base_url=os.environ["HBASE_GATEWAY_URL"],
             username=os.environ["HBASE_GATEWAY_USERNAME"],
             password=os.environ["HBASE_GATEWAY_PASSWORD"],
             timeout_seconds=float(os.getenv("HBASE_GATEWAY_TIMEOUT_SECONDS", "5")),

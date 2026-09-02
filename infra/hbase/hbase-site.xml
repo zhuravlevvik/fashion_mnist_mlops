@@ -7,7 +7,7 @@
     </property>
     <property>
         <name>hbase.rootdir</name>
-        <value>file://data/hbase</value>
+        <value>file:///data/hbase</value>
     </property>
     <property>
         <name>hbase.zookeeper.property.dataDir</name>
@@ -20,5 +20,13 @@
     <property>
         <name>hbase.thrift.info.port</name>
         <value>9095</value>
+    </property>
+    <property>
+        <name>hbase.wal.provider</name>
+        <value>filesystem</value>
+    </property>
+    <property>
+        <name>hbase.unsafe.stream.capability.enforce</name>
+        <value>false</value>
     </property>
 </configuration>
