@@ -1,0 +1,56 @@
+services:
+  hbase:
+    build:
+      context: ./infra/hbase
+    image: fashion-hbase:2.5.15
+    volumes:
+      - hbase-data:/data
+    restart: unless-stopped
+
+  hbase-gateway:
+    build: 
+      context: .
+      target: runtime
+    image: ${DOCKERHUB_IMAGE:-fashion-mnist-mlops}:${IMAGE_TAG:-local}
+    command: 
+      - uvicorn
+      - fashion_mnist_mlops.hbase_gateway:app
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8080"
+    environment:
+      HBASE_HOST: hbase
+      HBASE_THRIFT_PORT: "9090"
+      HBASE_TABLE: fashion_predictions
+      HBASE_GATEWAY_USERNAME: ${HBASE_GATEWAY_USERNAME:?set HBASE_GATEWAY_USERNAME}
+      HBASE_GATEWAY_PASSWORD: ${HBASE_GATEWAY_PASSWORD:?set HBASE_GATEWAY_PASSWORD}
+    depends_on:
+      hbase:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8080:8080"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=2)
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 15s
+    restart: unless-stopped
+  
+  api:
+    environment:
+      PREDICTION_DELIVERY: hbase
+      HBASE_GATEWAY_URL: http://hbase-gateway:8080
+      HBASE_GATEWAY_USERNAME: ${HBASE_GATEWAY_USERNAME:?set HBASE_GATEWAY_USERNAME}
+      HBASE_GATEWAY_PASSWORD: ${HBASE_GATEWAY_PASSWORD:?set HBASE_GATEWAY_PASSWORD}
+    depends_on:
+      hbase-gateway:
+        condition: service_healthy
+
+volumes:
+  hbase-data:
