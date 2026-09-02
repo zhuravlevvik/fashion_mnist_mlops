@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+    <property>
+        <name>hbase.cluster.distributed</name>
+        <value>false</value>
+    </property>
+    <property>
+        <name>hbase.rootdir</name>
+        <value>file://data/hbase</value>
+    </property>
+    <property>
+        <name>hbase.zookeeper.property.dataDir</name>
+        <value>/data/zookeeper</value>
+    </property>
+    <property>
+        <name>hbase.master.info.bindAddress</name>
+        <value>0.0.0.0</value>
+    </property>
+    <property>
+        <name>hbase.thrift.info.port</name>
+        <value>9095</value>
+    </property>
+</configuration>
