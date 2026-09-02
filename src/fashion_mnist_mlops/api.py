@@ -4,12 +4,15 @@ from __future__ import annotations
 
 import os
 from functools import lru_cache
+from hashlib import sha256
 
 import numpy as np
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field, field_validator
 
 from fashion_mnist_mlops.config import CLASS_NAMES, PROJECT_ROOT
+from fashion_mnist_mlops.delivery import DeliveryError, get_prediction_publisher
+from fashion_mnist_mlops.events import PredictionEvent
 from fashion_mnist_mlops.model import load_artifact
 
 DEFAULT_MODEL_PATH = PROJECT_ROOT / "models/model.joblib"
@@ -34,10 +37,12 @@ class PredictionRequest(BaseModel):
 
 
 class PredictionResponse(BaseModel):
+    prediction_id: str
     class_id: int
     label: str
     confidence: float
     probabilities: dict[str, float]
+    delivery: str
 
 
 @lru_cache
@@ -77,13 +82,33 @@ def create_app() -> FastAPI:
         probabilities = model.predict_proba(image)[0]
         class_id = int(np.argmax(probabilities))
         names = artifact["metadata"].get("classes", list(CLASS_NAMES))
-        return PredictionResponse(
+
+        event = PredictionEvent(
+            request_sha256=sha256(image.tobytes()).hexdigest(),
             class_id=class_id,
             label=names[class_id],
             confidence=float(probabilities[class_id]),
             probabilities={
                 name: float(value) for name, value in zip(names, probabilities, strict=True)
             },
+            model_config_sha256=artifact["metadata"].get("config_sha256"),
+        )
+
+        try:
+            receipt = get_prediction_publisher().publish(event)
+        except (DeliveryError, KeyError, ValueError) as e:
+            raise HTTPException(
+                status_code=503,
+                detail=f"Prediction delivery failed: {e}",
+            ) from e
+
+        return PredictionResponse(
+            prediction_id=event.prediction_id,
+            class_id=class_id,
+            label=names[class_id],
+            confidence=float(probabilities[class_id]),
+            probabilities=event.probabilities,
+            delivery=receipt.mode,
         )
 
     return app
