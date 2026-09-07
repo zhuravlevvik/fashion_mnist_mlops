@@ -9,6 +9,7 @@ from typing import Protocol
 import httpx
 
 from fashion_mnist_mlops.events import DeliveryReceipt, PredictionEvent
+from fashion_mnist_mlops.secret_provider import get_hbase_gateway_credentials
 
 
 class DeliveryError(RuntimeError):
@@ -64,10 +65,11 @@ def get_prediction_publisher() -> PredictionPublisher:
     if mode == "disabled":
         return DisabledPublisher()
     if mode == "hbase":
+        credentials = get_hbase_gateway_credentials()
         return HBaseGatewayPublisher(
             base_url=os.environ["HBASE_GATEWAY_URL"],
-            username=os.environ["HBASE_GATEWAY_USERNAME"],
-            password=os.environ["HBASE_GATEWAY_PASSWORD"],
+            username=credentials.username,
+            password=credentials.password,
             timeout_seconds=float(os.getenv("HBASE_GATEWAY_TIMEOUT_SECONDS", "5")),
         )
     raise ValueError(f"Unsupported PREDICTION_DELIVERY mode: {mode}")

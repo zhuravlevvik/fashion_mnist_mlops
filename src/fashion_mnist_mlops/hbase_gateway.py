@@ -1,6 +1,5 @@
 """Authenticated HTTP boundary in front of an internal HBase Thrift endpoint."""
 
-import os
 import secrets
 from collections.abc import Callable
 from contextlib import asynccontextmanager
@@ -12,17 +11,23 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
 from fashion_mnist_mlops.events import PredictionEvent
 from fashion_mnist_mlops.hbase_repository import HBaseRepository
+from fashion_mnist_mlops.secret_provider import get_hbase_gateway_credentials
 
 CredentialsProvider = Callable[[], tuple[str, str]]
 
+# Saved as legacy (lab 2)
+# def environment_credentials() -> tuple[str, str]:
+#     return os.environ["HBASE_GATEWAY_USERNAME"], os.environ["HBASE_GATEWAY_PASSWORD"]
 
-def environment_credentials() -> tuple[str, str]:
-    return os.environ["HBASE_GATEWAY_USERNAME"], os.environ["HBASE_GATEWAY_PASSWORD"]
+
+def configured_credentials() -> tuple[str, str]:
+    credentials = get_hbase_gateway_credentials()
+    return credentials.username, credentials.password
 
 
 def create_gateway_app(
     repository: HBaseRepository | None = None,
-    credentials_provider: CredentialsProvider = environment_credentials,
+    credentials_provider: CredentialsProvider = configured_credentials,
 ) -> FastAPI:
     repository = repository or HBaseRepository.from_env()
     security = HTTPBasic()
