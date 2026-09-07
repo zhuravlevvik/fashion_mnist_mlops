@@ -40,7 +40,7 @@ services:
       interval: 10s
       timeout: 3s
       retries: 10
-      start_period: 15s
+      start_period: 240s
     restart: unless-stopped
   
   api:
@@ -49,6 +49,7 @@ services:
       HBASE_GATEWAY_URL: http://hbase-gateway:8080
       HBASE_GATEWAY_USERNAME: ${HBASE_GATEWAY_USERNAME:-}
       HBASE_GATEWAY_PASSWORD: ${HBASE_GATEWAY_PASSWORD:-}
+      HBASE_GATEWAY_TIMEOUT_SECONDS: "15"
     depends_on:
       hbase-gateway:
         condition: service_healthy

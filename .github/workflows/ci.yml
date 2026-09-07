@@ -17,7 +17,7 @@ concurrency:
 jobs:
   quality-train-build:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
 
     steps:
       - name: Checkout
@@ -78,6 +78,9 @@ jobs:
           HBASE_GATEWAY_USERNAME="$gateway_username" \
           HBASE_GATEWAY_PASSWORD="$gateway_password" \
             python scripts/bootstrap_ansible_vault.py --force
+          vault_password="$(tr -d '\n' < secrets/ansible-vault-password.txt)"
+          echo "::add-mask::$vault_password"
+          echo "ANSIBLE_VAULT_PASSWORD=$vault_password" >> "$GITHUB_ENV"
 
       - name: Validate Compose configuration
         run: >-

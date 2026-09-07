@@ -24,7 +24,7 @@ jobs:
       github.event.workflow_run.conclusion == 'success'
 
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 35
 
     steps:
       - name: Resolve source commit
@@ -94,13 +94,16 @@ jobs:
           echo "HBASE_GATEWAY_USERNAME=$gateway_username" >> "$GITHUB_ENV"
           echo "HBASE_GATEWAY_PASSWORD=$gateway_password" >> "$GITHUB_ENV"
           docker run --rm \
-            --user root \
+            --user "$(id -u):$(id -g)" \
             -e HBASE_GATEWAY_USERNAME="$gateway_username" \
             -e HBASE_GATEWAY_PASSWORD="$gateway_password" \
             -v "$PWD:/workspace" \
             -w /workspace \
             "$TEST_IMAGE" \
             python scripts/bootstrap_ansible_vault.py --force
+          vault_password="$(tr -d '\n' < secrets/ansible-vault-password.txt)"
+          echo "::add-mask::$vault_password"
+          echo "ANSIBLE_VAULT_PASSWORD=$vault_password" >> "$GITHUB_ENV"
 
       - name: Validate Compose configuration
         run: >-

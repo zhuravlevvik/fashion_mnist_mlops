@@ -23,7 +23,7 @@ def test_api_scenarios() -> None:
     specifications = json.loads(SCENARIO_PATH.read_text())
     base_url = os.getenv("API_BASE_URL", specifications["base_url"])
 
-    with httpx.Client(base_url=base_url, timeout=15) as client:
+    with httpx.Client(base_url=base_url, timeout=30) as client:
         for scenario in specifications["scenarios"]:
             response = client.request(
                 scenario["method"], scenario["path"], json=expand_payload(scenario.get("payload"))

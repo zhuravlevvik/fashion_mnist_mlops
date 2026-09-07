@@ -25,4 +25,4 @@ services:
 
 secrets:
   ansible_vault_password:
-    file: ./secrets/ansible-vault-password.txt
+    environment: ANSIBLE_VAULT_PASSWORD
