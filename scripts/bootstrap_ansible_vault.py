@@ -66,6 +66,8 @@ def main() -> None:
             check=True,
             env=ansible_subprocess_environment(),
         )
+
+        vault_path.chmod(0o644)
     finally:
         source_path.unlink(missing_ok=True)
 
