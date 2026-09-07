@@ -1,5 +1,7 @@
 """Authenticated HTTP boundary in front of an internal HBase Thrift endpoint."""
 
+import asyncio
+import logging
 import secrets
 from collections.abc import Callable
 from contextlib import asynccontextmanager
@@ -8,11 +10,13 @@ from typing import Annotated
 import uvicorn
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from thriftpy2.thrift import TException
 
 from fashion_mnist_mlops.events import PredictionEvent
 from fashion_mnist_mlops.hbase_repository import HBaseRepository
 from fashion_mnist_mlops.secret_provider import get_hbase_gateway_credentials
 
+LOGGER = logging.getLogger(__name__)
 CredentialsProvider = Callable[[], tuple[str, str]]
 
 # Saved as legacy (lab 2)
@@ -25,6 +29,39 @@ def configured_credentials() -> tuple[str, str]:
     return credentials.username, credentials.password
 
 
+async def ensure_schema_with_retry(
+    repository: HBaseRepository,
+    attempts: int = 6,
+    delay_seconds: float = 5.0,
+) -> None:
+    """Wait until HBase can perform metadata operations through Thrift."""
+
+    if attempts < 1:
+        raise ValueError("attempts must be positive")
+
+    for attempt in range(1, attempts + 1):
+        try:
+            await asyncio.to_thread(repository.ensure_schema)
+            LOGGER.info("HBase schema is ready")
+            return
+        except (OSError, TException) as error:
+            if attempt == attempts:
+                LOGGER.exception(
+                    "HBase schema initialization failed after %s attempts",
+                    attempts,
+                )
+                raise
+
+            LOGGER.warning(
+                "HBase is not ready: attempt %s/%s failed with %s; " "retrying in %.1f seconds",
+                attempt,
+                attempts,
+                type(error).__name__,
+                delay_seconds,
+            )
+            await asyncio.sleep(delay_seconds)
+
+
 def create_gateway_app(
     repository: HBaseRepository | None = None,
     credentials_provider: CredentialsProvider = configured_credentials,
@@ -34,7 +71,7 @@ def create_gateway_app(
 
     @asynccontextmanager
     async def lifespan(_app: FastAPI):
-        repository.ensure_schema()
+        await ensure_schema_with_retry(repository)
         yield
 
     app = FastAPI(

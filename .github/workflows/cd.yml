@@ -124,7 +124,7 @@ jobs:
           -f docker-compose.yml
           -f compose.lab2.yml
           -f compose.lab3.yml
-          up -d --no-build --wait --wait-timeout 240
+          up -d --no-build --wait --wait-timeout 420
 
       - name: Run functional and integration tests
         run: |

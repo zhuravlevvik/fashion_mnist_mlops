@@ -25,6 +25,7 @@ services:
       HBASE_TABLE: fashion_predictions
       HBASE_GATEWAY_USERNAME: ${HBASE_GATEWAY_USERNAME:-}
       HBASE_GATEWAY_PASSWORD: ${HBASE_GATEWAY_PASSWORD:-}
+      HBASE_TIMEOUT_MS: "30000"
     depends_on:
       hbase:
         condition: service_healthy
