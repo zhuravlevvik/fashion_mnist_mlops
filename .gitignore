@@ -105,6 +105,7 @@ celerybeat.pid
 
 # Environments
 .env
+secrets/ansible-vault-password.txt
 .venv
 .uv-cache/
 env/

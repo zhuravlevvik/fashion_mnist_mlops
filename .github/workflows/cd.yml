@@ -66,6 +66,8 @@ jobs:
             exit 1
           fi
 
+          echo "DOCKERHUB_IMAGE=$DOCKER_IMAGE" >> "$GITHUB_ENV"
+          echo "IMAGE_TAG=$image_tag" >> "$GITHUB_ENV"
           echo "RUNTIME_IMAGE=$DOCKER_IMAGE:$image_tag" >> "$GITHUB_ENV"
           echo "TEST_IMAGE=$DOCKER_IMAGE:test-$image_tag" >> "$GITHUB_ENV"
 
@@ -83,56 +85,82 @@ jobs:
       - name: Run unit tests inside CI image
         run: docker run --rm "$TEST_IMAGE"
 
-      - name: Start runtime container
-        run: |
-          docker run \
-            --detach \
-            --name fashion-mnist-api \
-            --publish 8000:8000 \
-            "$RUNTIME_IMAGE"
-
-      - name: Wait for API health
+      - name: Bootstrap ephemeral Ansible Vault
         shell: bash
         run: |
-          for attempt in {1..30}; do
-            if curl \
-              --fail \
-              --silent \
-              --show-error \
-              http://127.0.0.1:8000/health
-            then
-              echo
-              echo "API is healthy"
-              exit 0
-            fi
+          gateway_username="fashion-api"
+          gateway_password="$(openssl rand -hex 32)"
+          echo "::add-mask::$gateway_password"
+          echo "HBASE_GATEWAY_USERNAME=$gateway_username" >> "$GITHUB_ENV"
+          echo "HBASE_GATEWAY_PASSWORD=$gateway_password" >> "$GITHUB_ENV"
+          docker run --rm \
+            --user root \
+            -e HBASE_GATEWAY_USERNAME="$gateway_username" \
+            -e HBASE_GATEWAY_PASSWORD="$gateway_password" \
+            -v "$PWD:/workspace" \
+            -w /workspace \
+            "$TEST_IMAGE" \
+            python scripts/bootstrap_ansible_vault.py --force
 
-            echo "Waiting for API: attempt $attempt/30"
-            sleep 2
-          done
+      - name: Validate Compose configuration
+        run: >-
+          docker compose
+          -f docker-compose.yml
+          -f compose.lab2.yml
+          -f compose.lab3.yml
+          config --quiet
 
-          echo "API did not become healthy" >&2
-          docker logs fashion-mnist-api
-          exit 1
+      - name: Build HBase infrastructure image
+        run: >-
+          docker compose
+          -f docker-compose.yml
+          -f compose.lab2.yml
+          -f compose.lab3.yml
+          build hbase
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-          cache: pip
-          cache-dependency-path: requirements-test.txt
+      - name: Start lab compose
+        run: >-
+          docker compose
+          -f docker-compose.yml
+          -f compose.lab2.yml
+          -f compose.lab3.yml
+          up -d --no-build --wait --wait-timeout 240
 
-      - name: Install functional-test dependencies
-        run: python -m pip install -r requirements-test.txt
-
-      - name: Run functional tests
-        env:
-          API_BASE_URL: http://127.0.0.1:8000
-        run: pytest -m functional tests/functional -vv
+      - name: Run functional and integration tests
+        run: |
+          docker run --rm \
+            --user root \
+            --network host \
+            -e API_BASE_URL=http://127.0.0.1:8000 \
+            -e HBASE_GATEWAY_PUBLIC_URL=http://127.0.0.1:8080 \
+            -e HBASE_GATEWAY_USERNAME="$HBASE_GATEWAY_USERNAME" \
+            -e HBASE_GATEWAY_PASSWORD="$HBASE_GATEWAY_PASSWORD" \
+            -e ANSIBLE_VAULT_FILE=/app/secrets/hbase.vault.yml \
+            -e ANSIBLE_VAULT_PASSWORD_FILE=/app/secrets/ansible-vault-password.txt \
+            -v "$PWD/secrets:/app/secrets:ro" \
+            -v "$PWD/scenario.json:/app/scenario.json:ro" \
+            "$TEST_IMAGE" \
+            pytest -p no:cacheprovider \
+              -m "functional or integration" \
+              tests/functional \
+              tests/integration/test_lab2_hbase.py \
+              tests/integration/test_lab3_vault.py \
+              -vv
 
       - name: Collect runtime logs
         if: always()
-        run: docker logs fashion-mnist-api || true
+        run: >-
+          docker compose
+          -f docker-compose.yml
+          -f compose.lab2.yml
+          -f compose.lab3.yml
+          logs --no-color || true
 
-      - name: Remove runtime container
+      - name: Stop lab compose
         if: always()
-        run: docker rm --force fashion-mnist-api || true
+        run: >-
+          docker compose
+          -f docker-compose.yml
+          -f compose.lab2.yml
+          -f compose.lab3.yml
+          down --volumes --remove-orphans || true

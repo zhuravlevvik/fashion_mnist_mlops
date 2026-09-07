@@ -23,8 +23,8 @@ services:
       HBASE_HOST: hbase
       HBASE_THRIFT_PORT: "9090"
       HBASE_TABLE: fashion_predictions
-      HBASE_GATEWAY_USERNAME: ${HBASE_GATEWAY_USERNAME:?set HBASE_GATEWAY_USERNAME}
-      HBASE_GATEWAY_PASSWORD: ${HBASE_GATEWAY_PASSWORD:?set HBASE_GATEWAY_PASSWORD}
+      HBASE_GATEWAY_USERNAME: ${HBASE_GATEWAY_USERNAME:-}
+      HBASE_GATEWAY_PASSWORD: ${HBASE_GATEWAY_PASSWORD:-}
     depends_on:
       hbase:
         condition: service_healthy
@@ -46,8 +46,8 @@ services:
     environment:
       PREDICTION_DELIVERY: hbase
       HBASE_GATEWAY_URL: http://hbase-gateway:8080
-      HBASE_GATEWAY_USERNAME: ${HBASE_GATEWAY_USERNAME:?set HBASE_GATEWAY_USERNAME}
-      HBASE_GATEWAY_PASSWORD: ${HBASE_GATEWAY_PASSWORD:?set HBASE_GATEWAY_PASSWORD}
+      HBASE_GATEWAY_USERNAME: ${HBASE_GATEWAY_USERNAME:-}
+      HBASE_GATEWAY_PASSWORD: ${HBASE_GATEWAY_PASSWORD:-}
     depends_on:
       hbase-gateway:
         condition: service_healthy

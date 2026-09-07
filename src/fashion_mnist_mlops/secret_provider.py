@@ -39,7 +39,7 @@ def ansible_vault_executable() -> str:
     raise SecretProviderError("ansible-vault executable is unavailable")
 
 
-def ansible_subproccess_environment() -> dict[str, str]:
+def ansible_subprocess_environment() -> dict[str, str]:
     environment = os.environ.copy()
     environment.setdefault("ANSIBLE_HOME", "/tmp/ansible-home")
     environment.setdefault("ANSIBLE_LOCAL_TEMP", "/tmp/ansible-local")
@@ -93,7 +93,7 @@ class AnsibleVaultSecretProvider:
                 capture_output=True,
                 text=True,
                 timeout=10,
-                env=ansible_subproccess_environment(),
+                env=ansible_subprocess_environment(),
             )
             payload = yaml.safe_load(result.stdout)
             hbase = payload["hbase_gateway"]

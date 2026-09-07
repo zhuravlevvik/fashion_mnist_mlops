@@ -49,7 +49,7 @@ def create_gateway_app(
         username_ok = secrets.compare_digest(credentials.username, expected_username)
         password_ok = secrets.compare_digest(credentials.password, expected_password)
 
-        if not (username_ok or password_ok):
+        if not (username_ok and password_ok):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid HBase gateway credentials",

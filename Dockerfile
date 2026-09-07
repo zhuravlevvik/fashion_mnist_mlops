@@ -7,7 +7,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
     PROJECT_ROOT=/app \
     CONFIG_PATH=/app/config.ini \
-    MODEL_PATH=/app/models/model.joblib
+    MODEL_PATH=/app/models/model.joblib \
+    ANSIBLE_HOME=/tmp/ansible-home \
+    ANSIBLE_LOCAL_TEMP=/tmp/ansible-local
 
 WORKDIR /app
 
@@ -19,7 +21,7 @@ RUN python -m pip install --upgrade pip && \
     python -m pip install -r requirements.txt && \
     python -m pip install --no-deps .
 
-COPY config.ini ./config.ini
+COPY config.ini ansible.cfg ./
 COPY models/model.joblib ./models/model.joblib
 
 RUN chown -R app:app /app
