@@ -50,7 +50,7 @@ def test_repository_initializes_and_round_trips_event() -> None:
         class_id=6,
         label="Shirt",
         confidence=0.72,
-        probabilities={"Shirt": 0.72}
+        probabilities={"Shirt": 0.72},
     )
 
     repository.ensure_schema()

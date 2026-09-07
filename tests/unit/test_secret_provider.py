@@ -7,7 +7,7 @@ from fashion_mnist_mlops.secret_provider import (
     EnvironmentSecretProvider,
     GatewayCredentials,
     SecretProviderError,
-    get_secret_provider
+    get_secret_provider,
 )
 
 
@@ -17,8 +17,7 @@ def test_environment_secret_provider(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("HBASE_GATEWAY_PASSWORD", "secret")
 
     assert EnvironmentSecretProvider().hbase_gateway_credentials() == GatewayCredentials(
-        username="fashion-api",
-        password="secret"
+        username="fashion-api", password="secret"
     )
 
 

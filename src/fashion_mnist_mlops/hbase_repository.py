@@ -1,6 +1,5 @@
 """HBase repository implemented through the Thrift gateway."""
 
-
 from __future__ import annotations
 
 import json
@@ -24,7 +23,7 @@ class HBaseRepository:
         port: int = 9090,
         table_name: str = "fashion_predictions",
         timeout_ms: int = 5000,
-        connection_factory: ConnectionFactory | None = None
+        connection_factory: ConnectionFactory | None = None,
     ) -> None:
         self.host = host
         self.port = port
@@ -76,7 +75,7 @@ class HBaseRepository:
             b"p:payload": payload,
             b"p:occured_at": event.occured_at.encode(),
             b"p:label": event.label.encode(),
-            b"p:confidence": format(event.confidence, ".12g").encode()
+            b"p:confidence": format(event.confidence, ".12g").encode(),
         }
 
         def write(connection: Any) -> None:

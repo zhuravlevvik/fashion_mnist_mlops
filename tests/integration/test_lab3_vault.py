@@ -22,11 +22,7 @@ def test_vault_credentials_protect_hbase_round_trip() -> None:
     )
     credentials = provider.hbase_gateway_credentials()
 
-    response = httpx.post(
-        f"{api_url}/predict",
-        json={"pixels": [0] * (28 * 28)},
-        timeout=15
-    )
+    response = httpx.post(f"{api_url}/predict", json={"pixels": [0] * (28 * 28)}, timeout=15)
     response.raise_for_status()
     prediction = response.json()
 
@@ -42,4 +38,4 @@ def test_vault_credentials_protect_hbase_round_trip() -> None:
 
     assert unauthorized.status_code == 401
     assert authorized.status_code == 200
-    assert authorized.json()['prediction_id'] == prediction["prediction_id"]
+    assert authorized.json()["prediction_id"] == prediction["prediction_id"]

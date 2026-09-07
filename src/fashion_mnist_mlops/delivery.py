@@ -17,8 +17,7 @@ class DeliveryError(RuntimeError):
 
 
 class PredictionPublisher(Protocol):
-    def publish(self, event: PredictionEvent) -> DeliveryReceipt:
-        ...
+    def publish(self, event: PredictionEvent) -> DeliveryReceipt: ...
 
 
 class DisabledPublisher:
@@ -42,16 +41,13 @@ class HBaseGatewayPublisher:
 
         self._base_url = base_url.rstrip("/")
         self._client = httpx.Client(
-            auth=(username, password),
-            timeout=timeout_seconds,
-            transport=transport
+            auth=(username, password), timeout=timeout_seconds, transport=transport
         )
 
     def publish(self, event: PredictionEvent) -> DeliveryReceipt:
         try:
             response = self._client.post(
-                f"{self._base_url}/predictions",
-                json=event.model_dump(mode="json")
+                f"{self._base_url}/predictions", json=event.model_dump(mode="json")
             )
             response.raise_for_status()
         except httpx.HTTPError as e:

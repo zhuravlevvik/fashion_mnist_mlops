@@ -61,7 +61,7 @@ def main() -> None:
                 str(password_path),
                 "--output",
                 str(vault_path),
-                str(source_path)
+                str(source_path),
             ],
             check=True,
             env=ansible_subprocess_environment(),

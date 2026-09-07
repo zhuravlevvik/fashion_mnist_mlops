@@ -8,13 +8,11 @@ from pathlib import Path
 
 SOURCE_PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
-PROJECT_ROOT = Path(
-    os.environ.get("PROJECT_ROOT", str(SOURCE_PROJECT_ROOT))
-).expanduser().resolve()
+PROJECT_ROOT = Path(os.environ.get("PROJECT_ROOT", str(SOURCE_PROJECT_ROOT))).expanduser().resolve()
 
-DEFAULT_CONFIG_PATH = Path(
-    os.environ.get("CONFIG_PATH", str(PROJECT_ROOT / "config.ini"))
-).expanduser().resolve()
+DEFAULT_CONFIG_PATH = (
+    Path(os.environ.get("CONFIG_PATH", str(PROJECT_ROOT / "config.ini"))).expanduser().resolve()
+)
 
 CLASS_NAMES = (
     "T-shirt/top",

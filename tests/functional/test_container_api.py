@@ -26,9 +26,7 @@ def test_api_scenarios() -> None:
     with httpx.Client(base_url=base_url, timeout=15) as client:
         for scenario in specifications["scenarios"]:
             response = client.request(
-                scenario["method"],
-                scenario["path"],
-                json=expand_payload(scenario.get("payload"))
+                scenario["method"], scenario["path"], json=expand_payload(scenario.get("payload"))
             )
 
             assert response.status_code == scenario["expected_status"]

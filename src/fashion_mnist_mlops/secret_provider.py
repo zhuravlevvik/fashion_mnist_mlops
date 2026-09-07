@@ -25,8 +25,7 @@ class GatewayCredentials:
 
 
 class SecretProvider(Protocol):
-    def hbase_gateway_credentials(self) -> GatewayCredentials:
-        ...
+    def hbase_gateway_credentials(self) -> GatewayCredentials: ...
 
 
 def ansible_vault_executable() -> str:
@@ -102,9 +101,7 @@ class AnsibleVaultSecretProvider:
                 password=hbase["password"],
             )
         except Exception as e:
-            raise SecretProviderError(
-                "Unable to load HBase credentials from Ansible Vault"
-            ) from e
+            raise SecretProviderError("Unable to load HBase credentials from Ansible Vault") from e
         return validate_credentials(credentials)
 
 

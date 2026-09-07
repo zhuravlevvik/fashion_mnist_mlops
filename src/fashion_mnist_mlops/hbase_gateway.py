@@ -53,7 +53,7 @@ def create_gateway_app(
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid HBase gateway credentials",
-                headers={"WWW-Authenticate": "Basic"}
+                headers={"WWW-Authenticate": "Basic"},
             )
         return credentials.username
 
@@ -64,16 +64,14 @@ def create_gateway_app(
 
     @app.post("/predictions", status_code=status.HTTP_201_CREATED)
     def store_prediction(
-        event: PredictionEvent,
-        _username: str = Depends(authenticate)
+        event: PredictionEvent, _username: str = Depends(authenticate)
     ) -> dict[str, str]:
         repository.put(event)
         return {"prediction_id": event.prediction_id, "status": "stored"}
 
     @app.get("/predictions/{prediction_id}")
     def get_prediction(
-        prediction_id: str,
-        _username: str = Depends(authenticate)
+        prediction_id: str, _username: str = Depends(authenticate)
     ) -> PredictionEvent:
         event = repository.get(prediction_id)
         if event is None:

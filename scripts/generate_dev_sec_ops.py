@@ -10,10 +10,7 @@ from pathlib import Path
 
 def git_hashes(limit: int = 5) -> list[str]:
     result = subprocess.run(
-        ["git", "log", f"-{limit}", "--format=%H"],
-        check=True,
-        capture_output=True,
-        text=True
+        ["git", "log", f"-{limit}", "--format=%H"], check=True, capture_output=True, text=True
     )
     return result.stdout.splitlines()
 

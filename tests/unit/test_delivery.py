@@ -13,7 +13,7 @@ def event() -> PredictionEvent:
         class_id=1,
         label="Shirt",
         confidence=0.89,
-        probabilities={"Shirt": 0.89, "T-shirt/top": 0.11}
+        probabilities={"Shirt": 0.89, "T-shirt/top": 0.11},
     )
 
 
@@ -26,10 +26,7 @@ def test_hbase_gateway_publisher_uses_auth_and_contract() -> None:
         return httpx.Response(201, json={"status": "stored"})
 
     publisher = HBaseGatewayPublisher(
-        "http://hbase-gateway:8080",
-        "fashion-api",
-        "secret",
-        transport=httpx.MockTransport(handler)
+        "http://hbase-gateway:8080", "fashion-api", "secret", transport=httpx.MockTransport(handler)
     )
 
     receipt = publisher.publish(event())
@@ -44,7 +41,7 @@ def test_hbase_gateway_publisher_maps_http_failure() -> None:
         "http://hbase-gateway:8080",
         "fashion-api",
         "secret",
-        transport=httpx.MockTransport(lambda _request: httpx.Response(503))
+        transport=httpx.MockTransport(lambda _request: httpx.Response(503)),
     )
 
     with pytest.raises(DeliveryError, match="rejected prediction"):

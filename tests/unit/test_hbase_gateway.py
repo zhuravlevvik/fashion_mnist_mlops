@@ -29,8 +29,7 @@ class FakeRepository:
 def test_gateway_authentication_and_round_trip() -> None:
     repository = FakeRepository()
     app = create_gateway_app(
-        repository=repository,
-        credentials_provider=lambda: ("fashion-api", "secret")
+        repository=repository, credentials_provider=lambda: ("fashion-api", "secret")
     )
     payload: dict[str, Any] = {
         "prediction_id": "prediction-19",
