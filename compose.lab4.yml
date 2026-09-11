@@ -63,7 +63,15 @@ services:
     image: ${DOCKERHUB_IMAGE:-fashion-mnist-mlops}:${IMAGE_TAG:-local}
     command: ["python", "-m", "fashion_mnist_mlops.consumer"]
     healthcheck:
-      disable: true
+      test:
+        - CMD
+        - python
+        - -c
+        - import os; os.kill(1, 0)
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
     environment:
       SECRET_PROVIDER: ansible-vault
       ANSIBLE_VAULT_FILE: /run/config/hbase.vault.yml
