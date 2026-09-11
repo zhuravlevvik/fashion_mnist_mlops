@@ -62,6 +62,8 @@ services:
       target: runtime
     image: ${DOCKERHUB_IMAGE:-fashion-mnist-mlops}:${IMAGE_TAG:-local}
     command: ["python", "-m", "fashion_mnist_mlops.consumer"]
+    healthcheck:
+      disable: true
     environment:
       SECRET_PROVIDER: ansible-vault
       ANSIBLE_VAULT_FILE: /run/config/hbase.vault.yml
