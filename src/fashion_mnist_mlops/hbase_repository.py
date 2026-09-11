@@ -73,7 +73,7 @@ class HBaseRepository:
         payload = json.dumps(event.model_dump(mode="json"), sort_keys=True).encode()
         columns = {
             b"p:payload": payload,
-            b"p:occured_at": event.occured_at.encode(),
+            b"p:occurred_at": event.occurred_at.encode(),
             b"p:label": event.label.encode(),
             b"p:confidence": format(event.confidence, ".12g").encode(),
         }

@@ -21,7 +21,14 @@
             "path": "/predict",
             "payload": {"pixels": {"fill": 0, "size": 784}},
             "expected_status": 200,
-            "expected_fields": ["class_id", "label", "confidence", "probabilities"]
+            "expected_fields": [
+                "prediction_id",
+                "class_id",
+                "label",
+                "confidence",
+                "probabilities",
+                "delivery"
+            ]
         }
     ]
 }

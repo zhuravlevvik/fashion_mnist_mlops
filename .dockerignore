@@ -1,4 +1,9 @@
 .git
+.env
+secrets/
+.uv-cache/
+output/
+tmp/
 .github
 .dvc/cache
 .dvc/tmp

@@ -35,6 +35,7 @@ def build_model(config: ConfigParser) -> Pipeline:
                     early_stopping=model.getboolean("early_stopping"),
                     validation_fraction=model.getfloat("validation_fraction"),
                     n_iter_no_change=model.getint("n_iter_no_change"),
+                    random_state=model.getint("random_seed"),
                 ),
             ),
         ]

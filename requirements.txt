@@ -6,3 +6,4 @@ joblib==1.4.2
 numpy==2.0.2
 scikit-learn==1.5.2
 uvicorn[standard]==0.34.0
+confluent-kafka==2.15.0

@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import json
 import os
 from functools import lru_cache
-from typing import Protocol
+from typing import Any, Protocol
 
 import httpx
+from confluent_kafka import Producer
 
 from fashion_mnist_mlops.events import DeliveryReceipt, PredictionEvent
 from fashion_mnist_mlops.secret_provider import get_hbase_gateway_credentials
@@ -55,17 +57,80 @@ class HBaseGatewayPublisher:
         return DeliveryReceipt(mode="hbase", destination=self._base_url)
 
 
+class KafkaPredictionPublisher:
+    """Synchronous delivery boundary over Kafka's asynchronous producer API."""
+
+    def __init__(
+        self,
+        bootstrap_servers: str,
+        topic: str,
+        timeout_seconds: float = 10.0,
+        producer: Any | None = None,
+    ) -> None:
+        if not bootstrap_servers or not topic:
+            raise ValueError("Kafka bootstrap servers and topic are required")
+        self._topic = topic
+        self._timeout_seconds = timeout_seconds
+        self._producer = producer or Producer(
+            {
+                "bootstrap.servers": bootstrap_servers,
+                "client.id": "fashion-mnist-api",
+                "acks": "all",
+                "enable.idempotence": True,
+            }
+        )
+
+    def publish(self, event: PredictionEvent) -> DeliveryReceipt:
+        errors: list[str] = []
+
+        def delivered(error: Any, _message: Any) -> None:
+            if error is not None:
+                errors.append(str(error))
+
+        try:
+            self._producer.produce(
+                self._topic,
+                key=event.prediction_id.encode(),
+                value=json.dumps(event.model_dump(mode="json"), sort_keys=True).encode(),
+                headers={"schema-version": str(event.schema_version)},
+                on_delivery=delivered,
+            )
+            remaining = self._producer.flush(self._timeout_seconds)
+        except Exception as e:
+            raise DeliveryError(f"Kafka rejected prediction: {e}") from e
+
+        if remaining or errors:
+            detail = errors[0] if errors else f"{remaining} message(s) still queued"
+            raise DeliveryError(f"Kafka delivery failed: {detail}")
+
+        return DeliveryReceipt(mode="kafka", destination=self._topic)
+
+
+def build_hbase_gateway_publisher() -> HBaseGatewayPublisher:
+    credentials = get_hbase_gateway_credentials()
+    return HBaseGatewayPublisher(
+        base_url=os.environ["HBASE_GATEWAY_URL"],
+        username=credentials.username,
+        password=credentials.password,
+        timeout_seconds=float(os.getenv("HBASE_GATEWAY_TIMEOUT_SECONDS", "5")),
+    )
+
+
+def build_kafka_publisher() -> KafkaPredictionPublisher:
+    return KafkaPredictionPublisher(
+        bootstrap_servers=os.environ["KAFKA_BOOTSTRAP_SERVERS"],
+        topic=os.getenv("KAFKA_PREDICTIONS_TOPIC", "fashion.predictions.v1"),
+        timeout_seconds=float(os.getenv("KAFKA_DELIVERY_TIMEOUT_SECONDS", "10")),
+    )
+
+
 @lru_cache(maxsize=1)
 def get_prediction_publisher() -> PredictionPublisher:
     mode = os.getenv("PREDICTION_DELIVERY", "disabled").strip().lower()
     if mode == "disabled":
         return DisabledPublisher()
     if mode == "hbase":
-        credentials = get_hbase_gateway_credentials()
-        return HBaseGatewayPublisher(
-            base_url=os.environ["HBASE_GATEWAY_URL"],
-            username=credentials.username,
-            password=credentials.password,
-            timeout_seconds=float(os.getenv("HBASE_GATEWAY_TIMEOUT_SECONDS", "5")),
-        )
+        return build_hbase_gateway_publisher()
+    if mode == "kafka":
+        return build_kafka_publisher()
     raise ValueError(f"Unsupported PREDICTION_DELIVERY mode: {mode}")

@@ -9,8 +9,8 @@ stages:
       size: 608
     - path: src/fashion_mnist_mlops/config.py
       hash: md5
-      md5: d85d1d260cd1a0360f96305f924cccf4
-      size: 1467
+      md5: 1349d20d90c946c4d2634b6403f2b734
+      size: 1660
     - path: src/fashion_mnist_mlops/data.py
       hash: md5
       md5: 2528d6fd88d2050f27d0e8514fa16a01
@@ -35,8 +35,8 @@ stages:
       nfiles: 4
     - path: src/fashion_mnist_mlops/config.py
       hash: md5
-      md5: d85d1d260cd1a0360f96305f924cccf4
-      size: 1467
+      md5: 1349d20d90c946c4d2634b6403f2b734
+      size: 1660
     - path: src/fashion_mnist_mlops/data.py
       hash: md5
       md5: 2528d6fd88d2050f27d0e8514fa16a01
@@ -60,12 +60,12 @@ stages:
       size: 26444535
     - path: src/fashion_mnist_mlops/config.py
       hash: md5
-      md5: d85d1d260cd1a0360f96305f924cccf4
-      size: 1467
+      md5: 1349d20d90c946c4d2634b6403f2b734
+      size: 1660
     - path: src/fashion_mnist_mlops/model.py
       hash: md5
-      md5: a531d8fc96a3ec3a8fd8d6f145f99459
-      size: 1657
+      md5: 333404a971de9a33536e939a3e53834b
+      size: 1719
     - path: src/fashion_mnist_mlops/train.py
       hash: md5
       md5: 371c17d0e939fddbe0decf8580bf2e7d
@@ -73,11 +73,11 @@ stages:
     outs:
     - path: models/model.joblib
       hash: md5
-      md5: 4a5ef28e43d807d980921aabb80397ba
-      size: 30785
+      md5: ee7888cc44b2571d491479fd9047d7d4
+      size: 30825
     - path: reports/train_summary.json
       hash: md5
-      md5: e8c1bf768faaa65ab1f99d96ed385e93
+      md5: bff5de37b7d1fd6c4e9705f0bed4c09a
       size: 491
   evaluate:
     cmd: python -m fashion_mnist_mlops.evaluate
@@ -92,8 +92,8 @@ stages:
       size: 4425408
     - path: models/model.joblib
       hash: md5
-      md5: 4a5ef28e43d807d980921aabb80397ba
-      size: 30785
+      md5: ee7888cc44b2571d491479fd9047d7d4
+      size: 30825
     - path: src/fashion_mnist_mlops/evaluate.py
       hash: md5
       md5: 03f420eeb6b6f61fd4693eede8e04e3f
@@ -101,9 +101,9 @@ stages:
     outs:
     - path: reports/confusion_matrix.csv
       hash: md5
-      md5: 07ebc8f75d370018e5a817e94a1aa1b8
-      size: 1900
+      md5: f2f231ac0f2353dd1dafdf9b2b286816
+      size: 1901
     - path: reports/metrics.json
       hash: md5
-      md5: f8cdfd76c8bdc7241f614f9706cf155d
+      md5: f4f875345e2683d0e76618e407345251
       size: 1988

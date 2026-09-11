@@ -11,7 +11,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field, field_validator
 
 from fashion_mnist_mlops.config import CLASS_NAMES, PROJECT_ROOT
-from fashion_mnist_mlops.delivery import DeliveryError, get_prediction_publisher
+from fashion_mnist_mlops.delivery import get_prediction_publisher
 from fashion_mnist_mlops.events import PredictionEvent
 from fashion_mnist_mlops.model import load_artifact
 
@@ -96,7 +96,7 @@ def create_app() -> FastAPI:
 
         try:
             receipt = get_prediction_publisher().publish(event)
-        except (DeliveryError, KeyError, ValueError) as e:
+        except Exception as e:
             raise HTTPException(
                 status_code=503,
                 detail=f"Prediction delivery failed: {e}",

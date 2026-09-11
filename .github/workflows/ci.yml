@@ -88,6 +88,7 @@ jobs:
           -f docker-compose.yml
           -f compose.lab2.yml
           -f compose.lab3.yml
+          -f compose.lab4.yml
           config --quiet
 
       - name: Build HBase infrastructure image
@@ -96,6 +97,7 @@ jobs:
           -f docker-compose.yml
           -f compose.lab2.yml
           -f compose.lab3.yml
+          -f compose.lab4.yml
           build hbase
 
       - name: Start lab compose
@@ -104,36 +106,40 @@ jobs:
           -f docker-compose.yml
           -f compose.lab2.yml
           -f compose.lab3.yml
+          -f compose.lab4.yml
           up -d --no-build --wait --wait-timeout 420
-        
+
       - name: Verify Vault file access
         run: |
-          docker compose \
-            -f docker-compose.yml \
-            -f compose.lab2.yml \
-            -f compose.lab3.yml \
-            exec -T api \
-            sh -c '
-              id
-              ls -ln /run/config/hbase.vault.yml
-              ls -ln /run/secrets/ansible_vault_password
-              test -r /run/config/hbase.vault.yml
-              test -r /run/secrets/ansible_vault_password
-            '
+          for service in api prediction-consumer; do
+            docker compose \
+              -f docker-compose.yml \
+              -f compose.lab2.yml \
+              -f compose.lab3.yml \
+              -f compose.lab4.yml \
+              exec -T "$service" \
+              sh -c '
+                id
+                ls -ln /run/config/hbase.vault.yml
+                ls -ln /run/secrets/ansible_vault_password
+                test -r /run/config/hbase.vault.yml
+                test -r /run/secrets/ansible_vault_password
+              '
+          done
 
       - name: Run functional tests
         env:
           API_BASE_URL: http://127.0.0.1:8000
         run: pytest -m functional tests/functional -vv
 
-      - name: Run HBase and Vault integration tests
+      - name: Run Kafka to HBase end-to-end test
         env:
           API_BASE_URL: http://127.0.0.1:8000
           HBASE_GATEWAY_PUBLIC_URL: http://127.0.0.1:8080
         run: >-
-          pytest -m integration
-          tests/integration/test_lab2_hbase.py
-          tests/integration/test_lab3_vault.py
+          pytest
+          -m integration
+          tests/integration/test_lab4_kafka.py
           -vv
 
       - name: Collect integration logs
@@ -143,6 +149,7 @@ jobs:
           -f docker-compose.yml
           -f compose.lab2.yml
           -f compose.lab3.yml
+          -f compose.lab4.yml
           logs --no-color || true
 
       - name: Stop lab compose
@@ -152,6 +159,7 @@ jobs:
           -f docker-compose.yml
           -f compose.lab2.yml
           -f compose.lab3.yml
+          -f compose.lab4.yml
           down --volumes --remove-orphans || true
 
       - name: Validate Docker Hub publication settings

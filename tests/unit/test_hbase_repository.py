@@ -45,7 +45,7 @@ def test_repository_initializes_and_round_trips_event() -> None:
     repository = HBaseRepository(host="hbase", connection_factory=lambda: connection)
     prediction = PredictionEvent(
         prediction_id="prediction-19",
-        occured_at="2026-08-26T10:00:00+08:00",
+        occurred_at="2026-08-26T10:00:00+08:00",
         request_sha256="ba" * 32,
         class_id=6,
         label="Shirt",

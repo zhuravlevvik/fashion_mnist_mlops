@@ -4,11 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fashion-mnist-mlops"
-version = "0.3.0"
+version = "0.4.0"
 description = "Reproducible LogRegression pipeline and API for Fashion-MNIST"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
+    "confluent-kafka==2.15.0",
     "ansible-core==2.19.12",
     "fastapi==0.115.6",
     "happybase==1.3.0",
@@ -24,6 +25,7 @@ fashion-data = "fashion_mnist_mlops.data:main"
 fashion-train = "fashion_mnist_mlops.train:main"
 fashion-evaluate = "fashion_mnist_mlops.evaluate:main"
 fashion-hbase-gateway = "fashion_mnist_mlops.hbase_gateway:main"
+fashion-kafka-consumer = "fashion_mnist_mlops.consumer:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

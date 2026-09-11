@@ -111,6 +111,7 @@ jobs:
           -f docker-compose.yml
           -f compose.lab2.yml
           -f compose.lab3.yml
+          -f compose.lab4.yml
           config --quiet
 
       - name: Build HBase infrastructure image
@@ -119,6 +120,7 @@ jobs:
           -f docker-compose.yml
           -f compose.lab2.yml
           -f compose.lab3.yml
+          -f compose.lab4.yml
           build hbase
 
       - name: Start lab compose
@@ -127,17 +129,16 @@ jobs:
           -f docker-compose.yml
           -f compose.lab2.yml
           -f compose.lab3.yml
+          -f compose.lab4.yml
           up -d --no-build --wait --wait-timeout 420
 
-      - name: Run functional and integration tests
+      - name: Run functional and Kafka integration tests
         run: |
           docker run --rm \
             --user root \
             --network host \
             -e API_BASE_URL=http://127.0.0.1:8000 \
             -e HBASE_GATEWAY_PUBLIC_URL=http://127.0.0.1:8080 \
-            -e HBASE_GATEWAY_USERNAME="$HBASE_GATEWAY_USERNAME" \
-            -e HBASE_GATEWAY_PASSWORD="$HBASE_GATEWAY_PASSWORD" \
             -e ANSIBLE_VAULT_FILE=/app/secrets/hbase.vault.yml \
             -e ANSIBLE_VAULT_PASSWORD_FILE=/app/secrets/ansible-vault-password.txt \
             -v "$PWD/secrets:/app/secrets:ro" \
@@ -146,8 +147,7 @@ jobs:
             pytest -p no:cacheprovider \
               -m "functional or integration" \
               tests/functional \
-              tests/integration/test_lab2_hbase.py \
-              tests/integration/test_lab3_vault.py \
+              tests/integration/test_lab4_kafka.py \
               -vv
 
       - name: Collect runtime logs
@@ -157,6 +157,7 @@ jobs:
           -f docker-compose.yml
           -f compose.lab2.yml
           -f compose.lab3.yml
+          -f compose.lab4.yml
           logs --no-color || true
 
       - name: Stop lab compose
@@ -166,4 +167,5 @@ jobs:
           -f docker-compose.yml
           -f compose.lab2.yml
           -f compose.lab3.yml
+          -f compose.lab4.yml
           down --volumes --remove-orphans || true

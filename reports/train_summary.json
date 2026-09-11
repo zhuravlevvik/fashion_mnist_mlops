@@ -14,12 +14,12 @@
     "Ankle boot"
   ],
   "config_sha256": "4efacff13afe9b6a26c14715b7b739be04d44600a48a95a5d3f2f1ccbae26ab1",
-  "created_at": "2026-08-31T20:33:41.014535+00:00",
+  "created_at": "2026-09-11T09:55:33.159337+00:00",
   "image_shape": [
     28,
     28
   ],
   "scikit_learn_version": "1.5.2",
   "train_samples": 60000,
-  "duration_seconds": 29.088
+  "duration_seconds": 17.209
 }

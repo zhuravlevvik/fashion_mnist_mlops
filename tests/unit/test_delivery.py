@@ -8,7 +8,7 @@ from fashion_mnist_mlops.events import PredictionEvent
 def event() -> PredictionEvent:
     return PredictionEvent(
         prediction_id="prediction-1",
-        occured_at="2026-09-26T19:19:19+03:00",
+        occurred_at="2026-09-26T19:19:19+03:00",
         request_sha256="ab" * 32,
         class_id=1,
         label="Shirt",

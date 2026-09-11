@@ -37,7 +37,7 @@ def test_gateway_authentication_and_round_trip() -> None:
     )
     payload: dict[str, Any] = {
         "prediction_id": "prediction-19",
-        "occured_at": "2026-08-26T10:00:00+00:00",
+        "occurred_at": "2026-08-26T10:00:00+00:00",
         "request_sha256": "c" * 64,
         "class_id": 1,
         "label": "Shirt",

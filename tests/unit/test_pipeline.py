@@ -95,6 +95,7 @@ def test_complete_training_pipeline(tmp_path: Path) -> None:
     model_path = train(config_path)
     artifact = load_artifact(model_path)
     assert artifact["metadata"]["train_samples"] == 100
+    assert artifact["model"].named_steps["classifier"].random_state == 19
 
     metrics = evaluate(config_path)
     assert metrics["accuracy"] >= 0.5
